@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     double leftX = m_controller.getLeftX();
     double rightX = m_controller.getRightX();
 
-    SmartDashboard.putString("0. Raw joystick inputs",
+    SmartDashboard.putString("1. Raw joystick inputs",
         String.format("Joystick inputs(leftY: %s, leftX: %s, rightX: %s)",
         leftY, leftX, rightX));
 
