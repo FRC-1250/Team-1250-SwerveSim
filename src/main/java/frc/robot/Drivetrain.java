@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Represents a swerve drive style drivetrain. */
@@ -14,25 +16,26 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
+  private final Translation2d frontLeftModuleLocation = new Translation2d(0.381, 0.381);
+  private final Translation2d frontRightModuleLocation = new Translation2d(0.381, -0.381);
+  private final Translation2d backLeftModuleLocation = new Translation2d(-0.381, 0.381);
+  private final Translation2d backRightModuleLocation = new Translation2d(-0.381, -0.381);
 
-  private final SwerveModule m_frontLeft = new SwerveModule(1, 2, 0, 1, 2, 3);
-  private final SwerveModule m_frontRight = new SwerveModule(3, 4, 4, 5, 6, 7);
-  private final SwerveModule m_backLeft = new SwerveModule(5, 6, 8, 9, 10, 11);
-  private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14, 15);
+  // https://docs.ctre-phoenix.com/en/stable/ch21_Errata.html#talon-fx-remote-filter-device-id-must-be-15-or-less
+  private final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(1, 2, 3);
+  private final SwerveModuleTalonFX frontRightModule = new SwerveModuleTalonFX(4, 5, 6);
+  private final SwerveModuleTalonFX backLeftModule = new SwerveModuleTalonFX(7, 8, 9);
+  private final SwerveModuleTalonFX backRightModule = new SwerveModuleTalonFX(10, 11, 12);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final WPI_Pigeon2 pidgey = new WPI_Pigeon2(13);
 
-  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+  private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+      frontLeftModuleLocation, frontRightModuleLocation, backLeftModuleLocation, backRightModuleLocation);
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, m_gyro.getRotation2d());
+  private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, pidgey.getRotation2d());
 
   public Drivetrain() {
-    m_gyro.reset();
+    pidgey.reset();
   }
 
   /**
@@ -40,50 +43,40 @@ public class Drivetrain {
    *
    * @param xSpeed        Speed of the robot in the x direction (forward).
    * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
+   * @param rotation      Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
   @SuppressWarnings("ParameterName")
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rotation, boolean fieldRelative) {
     ChassisSpeeds speeds;
 
-    SmartDashboard.putString("1. Speed inputs",
-        String.format("Speed inputs(xSpeed: %s, ySpeed: %s, rotation: %s, Field relative: %s)",
-            xSpeed, ySpeed, rot, fieldRelative));
-
     if (fieldRelative) {
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d());
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotation, pidgey.getRotation2d());
     } else {
-      speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
+      speeds = new ChassisSpeeds(xSpeed, ySpeed, rotation);
     }
 
-    SmartDashboard.putString("2. Chasis speeds", speeds.toString());
-
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(speeds);
-
-    for (int i = 0; i < swerveModuleStates.length; i++) {
-      SmartDashboard.putString("5. Saturated SwerveModuleState " + i, swerveModuleStates[i].toString());
-    }
+    var swerveModuleStates = kinematics.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
     for (int i = 0; i < swerveModuleStates.length; i++) {
-      SmartDashboard.putString("6. Desaturated SwerveModuleState " + i, swerveModuleStates[i].toString());
+      SmartDashboard.putString("2. Desaturated SwerveModuleState " + i, swerveModuleStates[i].toString());
     }
 
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_backLeft.setDesiredState(swerveModuleStates[2]);
-    m_backRight.setDesiredState(swerveModuleStates[3]);
+    frontLeftModule.setDesiredState(swerveModuleStates[0]);
+    frontRightModule.setDesiredState(swerveModuleStates[1]);
+    backLeftModule.setDesiredState(swerveModuleStates[2]);
+    backRightModule.setDesiredState(swerveModuleStates[3]);
   }
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
-    m_odometry.update(
-        m_gyro.getRotation2d(),
-        m_frontLeft.getState(),
-        m_frontRight.getState(),
-        m_backLeft.getState(),
-        m_backRight.getState());
+    odometry.update(
+        pidgey.getRotation2d(),
+        frontLeftModule.getState(),
+        frontRightModule.getState(),
+        backLeftModule.getState(),
+        backRightModule.getState());
   }
 }
