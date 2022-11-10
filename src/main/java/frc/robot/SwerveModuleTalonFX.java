@@ -28,7 +28,7 @@ public class SwerveModuleTalonFX {
 
         canCoder = new CANCoder(canCoderCanID);
         canCoder.configFactoryDefault();
-        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         canCoder.configSensorDirection(true);
         canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
 
@@ -37,7 +37,7 @@ public class SwerveModuleTalonFX {
 
         turningTalon.configRemoteFeedbackFilter(canCoder, 0);
         turningTalon.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);
-        turningTalon.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        turningTalon.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Signed_PlusMinus180);
         turningTalon.config_kF(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_POSITION_GAINS.kF, Constants.CAN_TIMEOUT_MS);
         turningTalon.config_kP(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_POSITION_GAINS.kP, Constants.CAN_TIMEOUT_MS);
         turningTalon.config_kI(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_POSITION_GAINS.kI, Constants.CAN_TIMEOUT_MS);
