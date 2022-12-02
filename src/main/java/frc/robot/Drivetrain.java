@@ -22,10 +22,10 @@ public class Drivetrain {
   private final Translation2d backRightModuleLocation = new Translation2d(-0.381, -0.381);
 
   // https://docs.ctre-phoenix.com/en/stable/ch21_Errata.html#talon-fx-remote-filter-device-id-must-be-15-or-less
-  private final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(21, 22, 15);
-  private final SwerveModuleTalonFX frontRightModule = new SwerveModuleTalonFX(4, 5, 6);
-  private final SwerveModuleTalonFX backLeftModule = new SwerveModuleTalonFX(7, 8, 9);
-  private final SwerveModuleTalonFX backRightModule = new SwerveModuleTalonFX(10, 11, 12);
+  public final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(21, 22, 15);
+  public final SwerveModuleTalonFX frontRightModule = new SwerveModuleTalonFX(4, 5, 6);
+  public final SwerveModuleTalonFX backLeftModule = new SwerveModuleTalonFX(7, 8, 9);
+  public final SwerveModuleTalonFX backRightModule = new SwerveModuleTalonFX(10, 11, 12);
 
   private final WPI_Pigeon2 pidgey = new WPI_Pigeon2(13);
 

@@ -64,4 +64,9 @@ public class SwerveModuleTalonFX {
         return Rotation2d.fromDegrees(canCoder.getPosition());
     }
     
+    public void setPosTalon() {
+        canCoder.setPositionToAbsolute();
+        canCoder.setPosition(0);  
+    }
+    
 }
