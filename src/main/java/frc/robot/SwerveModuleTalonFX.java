@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveModuleTalonFX {
-    private static final int METERS_PER_SECOND_TO_TALON_TICKS_CONVERSION_FACTOR = 2000;
+    private static final int METERS_PER_SECOND_TO_TALON_TICKS_CONVERSION_FACTOR = 5000;
     private static final double DEGRESS_TO_TALON_TICKS_CONVERSION_FACTOR = 11.4;
     private final WPI_TalonFX driveTalon;
     private final WPI_TalonFX turningTalon;
@@ -23,8 +23,8 @@ public class SwerveModuleTalonFX {
         driveTalon.configFactoryDefault();
         driveTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);
         driveTalon.configClosedloopRamp(0.5);
-        driveTalon.configPeakOutputForward(0.5);
-        driveTalon.configPeakOutputReverse(-0.5);
+        driveTalon.configPeakOutputForward(1);
+        driveTalon.configPeakOutputReverse(-1);
         driveTalon.config_kF(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_VELOCITY_GAINS.kF, Constants.CAN_TIMEOUT_MS);
         driveTalon.config_kP(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_VELOCITY_GAINS.kP, Constants.CAN_TIMEOUT_MS);
         driveTalon.config_kI(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_VELOCITY_GAINS.kI, Constants.CAN_TIMEOUT_MS);
@@ -42,8 +42,8 @@ public class SwerveModuleTalonFX {
         turningTalon.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);
         turningTalon.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Signed_PlusMinus180);
         turningTalon.configClosedloopRamp(0.5);
-        turningTalon.configPeakOutputForward(0.5);
-        turningTalon.configPeakOutputReverse(-0.5);
+        turningTalon.configPeakOutputForward(1);
+        turningTalon.configPeakOutputReverse(-1);
         turningTalon.config_kF(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_POSITION_GAINS.kF, Constants.CAN_TIMEOUT_MS);
         turningTalon.config_kP(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_POSITION_GAINS.kP, Constants.CAN_TIMEOUT_MS);
         turningTalon.config_kI(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TALONFX_POSITION_GAINS.kI, Constants.CAN_TIMEOUT_MS);

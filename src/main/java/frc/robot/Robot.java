@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    // If swerve module is replaced then calibration has to be done again
     if (m_controller.getStartButton() && m_controller.getBackButton()) {
       m_swerve.frontLeftModule.setPosTalon();
       m_swerve.frontRightModule.setPosTalon();

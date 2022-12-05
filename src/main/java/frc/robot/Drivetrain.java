@@ -16,10 +16,24 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
+  // The distance between centers of the right and left wheels on the robot
+  private static final double trackWidth = 0.5;
+
+  // The distance between front and back wheels on the robot
+  private static final double wheelBase = 0.5;
+
+  // The 2d translation is based on X and Y values from origin. TrackWidth and WheelBase must be of the same unit.
+  private final Translation2d frontLeftModuleLocation = new Translation2d(wheelBase / 2, trackWidth / 2);
+  private final Translation2d frontRightModuleLocation = new Translation2d(wheelBase / 2, -trackWidth / 2);
+  private final Translation2d backLeftModuleLocation = new Translation2d(-wheelBase / 2, trackWidth / 2);
+  private final Translation2d backRightModuleLocation = new Translation2d(-wheelBase / 2, -trackWidth / 2);
+
+  /*
   private final Translation2d frontLeftModuleLocation = new Translation2d(0.381, 0.381);
   private final Translation2d frontRightModuleLocation = new Translation2d(0.381, -0.381);
   private final Translation2d backLeftModuleLocation = new Translation2d(-0.381, 0.381);
   private final Translation2d backRightModuleLocation = new Translation2d(-0.381, -0.381);
+  */
 
   // https://docs.ctre-phoenix.com/en/stable/ch21_Errata.html#talon-fx-remote-filter-device-id-must-be-15-or-less
   public final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(21, 22, 15);
