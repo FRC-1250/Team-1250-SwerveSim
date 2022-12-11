@@ -5,46 +5,67 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  /**
+   * The maxmimum velocity that the swerve modules is capable of in meters per
+   * second (m/s).
+   * This value can be derived mathimatically OR will be available from the
+   * manufacturer of the
+   * swerve module.
+   * 
+   * @see <a href=
+   *      "https://www.swervedrivespecialties.com/products/mk4-swerve-module">MK4
+   *      Swerve Module L1 - Standard </a>
+   */
+  public static final double maxDriveSpeed = 4.115;
 
-  // The distance between centers of the right and left wheels on the robot
-  private static final double trackWidth = 0.5;
+  /**
+   * The maxmimum angular velocity that the swerve module is capable of in
+   * rotations per second.
+   * This value is easy to represent as some multiple of PI.
+   * <p>
+   * For example: 2 * Math.PI is 1 rotation per second.
+   */
+  public static final double maxTurningSpeed = Math.PI; // rotation per second
 
-  // The distance between front and back wheels on the robot
-  private static final double wheelBase = 0.5;
+  private final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(
+      Constants.FRONT_LEFT_DRIVE_TALON_CAN_ID,
+      Constants.FRONT_LEFT_TURNING_TALON_CAN_ID,
+      Constants.FRONT_LEFT_CANCODER_CAN_ID,
+      Constants.FRONT_LEFT_CANCODER_OFFSET);
 
-  // The 2d translation is based on X and Y values from origin. TrackWidth and WheelBase must be of the same unit.
-  private final Translation2d frontLeftModuleLocation = new Translation2d(wheelBase / 2, trackWidth / 2);
-  private final Translation2d frontRightModuleLocation = new Translation2d(wheelBase / 2, -trackWidth / 2);
-  private final Translation2d backLeftModuleLocation = new Translation2d(-wheelBase / 2, trackWidth / 2);
-  private final Translation2d backRightModuleLocation = new Translation2d(-wheelBase / 2, -trackWidth / 2);
+  private final SwerveModuleTalonFX frontRightModule = new SwerveModuleTalonFX(
+      Constants.FRONT_RIGHT_DRIVE_TALON_CAN_ID,
+      Constants.FRONT_RIGHT_TURNING_TALON_CAN_ID,
+      Constants.FRONT_RIGHT_CANCODER_CAN_ID,
+      Constants.FRONT_RIGHT_CANCODER_OFFSET);
 
-  /*
-  private final Translation2d frontLeftModuleLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d frontRightModuleLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d backLeftModuleLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d backRightModuleLocation = new Translation2d(-0.381, -0.381);
-  */
+  private final SwerveModuleTalonFX rearLeftModule = new SwerveModuleTalonFX(
+      Constants.REAR_LEFT_DRIVE_TALON_CAN_ID,
+      Constants.REAR_LEFT_TURNING_TALON_CAN_ID,
+      Constants.REAR_LEFT_CANCODER_CAN_ID,
+      Constants.REAR_LEFT_CANCODER_OFFSET);
 
-  // https://docs.ctre-phoenix.com/en/stable/ch21_Errata.html#talon-fx-remote-filter-device-id-must-be-15-or-less
-  public final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(21, 22, 15);
-  public final SwerveModuleTalonFX frontRightModule = new SwerveModuleTalonFX(4, 5, 6);
-  public final SwerveModuleTalonFX backLeftModule = new SwerveModuleTalonFX(7, 8, 9);
-  public final SwerveModuleTalonFX backRightModule = new SwerveModuleTalonFX(10, 11, 12);
+  private final SwerveModuleTalonFX rearRightModule = new SwerveModuleTalonFX(
+      Constants.REAR_RIGHT_DRIVE_TALON_CAN_ID,
+      Constants.REAR_RIGHT_TURNING_TALON_CAN_ID,
+      Constants.REAR_RIGHT_CANCODER_CAN_ID,
+      Constants.REAR_RIGHT_CANCODER_OFFSET);
 
-  private final WPI_Pigeon2 pidgey = new WPI_Pigeon2(13);
+  private final WPI_Pigeon2 pidgey = new WPI_Pigeon2(
+      Constants.PIDGEON_CAN_ID,
+      Constants.CANIVORE_BUS_NAME);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      frontLeftModuleLocation, frontRightModuleLocation, backLeftModuleLocation, backRightModuleLocation);
+      Constants.FRONT_LEFT_MODULE_LOCATION,
+      Constants.FRONT_RIGHT_MODULE_LOCATION,
+      Constants.REAR_LEFT_MODULE_LOCATION,
+      Constants.REAR_RIGHT_MODULE_LOCATION);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, pidgey.getRotation2d());
 
@@ -73,15 +94,15 @@ public class Drivetrain {
 
     var swerveModuleStates = kinematics.toSwerveModuleStates(speeds);
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxDriveSpeed);
     for (int i = 0; i < swerveModuleStates.length; i++) {
       SmartDashboard.putString("2. Desaturated SwerveModuleState " + i, swerveModuleStates[i].toString());
     }
 
     frontLeftModule.setDesiredState(swerveModuleStates[0]);
     frontRightModule.setDesiredState(swerveModuleStates[1]);
-    backLeftModule.setDesiredState(swerveModuleStates[2]);
-    backRightModule.setDesiredState(swerveModuleStates[3]);
+    rearLeftModule.setDesiredState(swerveModuleStates[2]);
+    rearRightModule.setDesiredState(swerveModuleStates[3]);
   }
 
   /** Updates the field relative position of the robot. */
@@ -90,7 +111,7 @@ public class Drivetrain {
         pidgey.getRotation2d(),
         frontLeftModule.getState(),
         frontRightModule.getState(),
-        backLeftModule.getState(),
-        backRightModule.getState());
+        rearLeftModule.getState(),
+        rearRightModule.getState());
   }
 }
