@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -7,10 +7,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Constants;
 
 public class SwerveModuleTalonFX {
     private final WPI_TalonFX driveTalon;
@@ -19,6 +19,15 @@ public class SwerveModuleTalonFX {
 
     public SwerveModuleTalonFX(int driveTalonCanID, int turningTalonCanID, int canCoderCanID, double canCoderOffsetDegrees) {
         driveTalon = new WPI_TalonFX(driveTalonCanID, Constants.CANIVORE_BUS_NAME);
+        canCoder = new CANCoder(canCoderCanID, Constants.CANIVORE_BUS_NAME);
+        turningTalon = new WPI_TalonFX(turningTalonCanID, Constants.CANIVORE_BUS_NAME);
+
+        configureDriveTalon();
+        configureCanCoder(canCoderOffsetDegrees);
+        configureTurningTalon();
+    }
+
+    private void configureDriveTalon() {
         driveTalon.configFactoryDefault();
         driveTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);
         driveTalon.configClosedloopRamp(0.5, Constants.CAN_TIMEOUT_MS);
@@ -27,16 +36,17 @@ public class SwerveModuleTalonFX {
         driveTalon.config_kI(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.DRIVE_TALON_VELOCITY_GAINS.kI, Constants.CAN_TIMEOUT_MS);
         driveTalon.config_kD(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.DRIVE_TALON_VELOCITY_GAINS.kD, Constants.CAN_TIMEOUT_MS);
         driveTalon.setNeutralMode(NeutralMode.Brake);
+    }
 
-        canCoder = new CANCoder(canCoderCanID, Constants.CANIVORE_BUS_NAME);
+    private void configureCanCoder(double canCoderOffsetDegrees) {
         canCoder.configFactoryDefault();
         canCoder.configMagnetOffset(canCoderOffsetDegrees, Constants.CAN_TIMEOUT_MS);
         canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180, Constants.CAN_TIMEOUT_MS);
         canCoder.configSensorDirection(true, Constants.CAN_TIMEOUT_MS);
-        canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, Constants.CAN_TIMEOUT_MS);
         canCoder.setPositionToAbsolute(Constants.CAN_TIMEOUT_MS);
+    }
 
-        turningTalon = new WPI_TalonFX(turningTalonCanID, Constants.CANIVORE_BUS_NAME);
+    private void configureTurningTalon() {
         turningTalon.configFactoryDefault();
         turningTalon.configRemoteFeedbackFilter(canCoder, 0, Constants.CAN_TIMEOUT_MS);
         turningTalon.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);

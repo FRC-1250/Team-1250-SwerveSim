@@ -2,15 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.modules.SwerveModuleTalonFX;
 
-public class Drivetrain {
+public class Drivetrain extends SubsystemBase {
   /**
    * The maxmimum velocity that the swerve modules is capable of in meters per
    * second (m/s).
@@ -32,6 +37,11 @@ public class Drivetrain {
    * For example: 2 * Math.PI is 1 rotation per second.
    */
   public static final double maxTurningSpeed = Math.PI; // rotation per second
+
+  /**
+   * The acceleration of the swerve module.
+   */
+  public static final double maxDriveAcceleration = 2.0575;
 
   private final SwerveModuleTalonFX frontLeftModule = new SwerveModuleTalonFX(
       Constants.FRONT_LEFT_DRIVE_TALON_CAN_ID,
@@ -61,7 +71,7 @@ public class Drivetrain {
       Constants.PIDGEON_CAN_ID,
       Constants.CANIVORE_BUS_NAME);
 
-  private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+  public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
       Constants.FRONT_LEFT_MODULE_LOCATION,
       Constants.FRONT_RIGHT_MODULE_LOCATION,
       Constants.REAR_LEFT_MODULE_LOCATION,
@@ -92,26 +102,81 @@ public class Drivetrain {
       speeds = new ChassisSpeeds(xSpeed, ySpeed, rotation);
     }
 
-    var swerveModuleStates = kinematics.toSwerveModuleStates(speeds);
-
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxDriveSpeed);
-    for (int i = 0; i < swerveModuleStates.length; i++) {
-      SmartDashboard.putString("2. Desaturated SwerveModuleState " + i, swerveModuleStates[i].toString());
-    }
-
-    frontLeftModule.setDesiredState(swerveModuleStates[0]);
-    frontRightModule.setDesiredState(swerveModuleStates[1]);
-    rearLeftModule.setDesiredState(swerveModuleStates[2]);
-    rearRightModule.setDesiredState(swerveModuleStates[3]);
+    setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
 
-  /** Updates the field relative position of the robot. */
-  public void updateOdometry() {
+  /**
+   * Sets the swerve ModuleStates.
+   *
+   * @param desiredStates The desired SwerveModule states.
+   */
+  public void setModuleStates(SwerveModuleState[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxDriveSpeed);
+
+    SmartDashboard.putString("2.0 Front left module DESIRED", desiredStates[0].toString());
+    SmartDashboard.putString("2.1 Front right module DESIRED", desiredStates[1].toString());
+    SmartDashboard.putString("2.2 Rear left module DESIRED", desiredStates[2].toString());
+    SmartDashboard.putString("2.3 Rear right module DESIRED", desiredStates[3].toString());
+
+    frontLeftModule.setDesiredState(desiredStates[0]);
+    frontRightModule.setDesiredState(desiredStates[1]);
+    rearLeftModule.setDesiredState(desiredStates[2]);
+    rearRightModule.setDesiredState(desiredStates[3]);
+  }
+
+  /** Zeroes the heading of the robot. */
+  public void zeroHeading() {
+    pidgey.reset();
+  }
+
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from -180 to 180
+   */
+  public double getHeading() {
+    return pidgey.getRotation2d().getDegrees();
+  }
+
+  /**
+   * Returns the turn rate of the robot.
+   *
+   * @return The turn rate of the robot, in degrees per second
+   */
+  public double getTurnRate() {
+    return pidgey.getRate();
+  }
+
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    return odometry.getPoseMeters();
+  }
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    odometry.resetPosition(pose, pidgey.getRotation2d());
+  }
+
+  @Override
+  public void periodic() {
     odometry.update(
         pidgey.getRotation2d(),
         frontLeftModule.getState(),
         frontRightModule.getState(),
         rearLeftModule.getState(),
         rearRightModule.getState());
+    SmartDashboard.putNumber("Pigeon heading", pidgey.getAngle());
+    SmartDashboard.putString("2.0 Front left module CURRENT", frontLeftModule.getState().toString());
+    SmartDashboard.putString("2.1 Front right module CURRENT", frontRightModule.getState().toString());
+    SmartDashboard.putString("2.2 Rear left module CURRENT", rearLeftModule.getState().toString());
+    SmartDashboard.putString("2.3 Rear right module CURRENT", rearRightModule.getState().toString());
   }
 }

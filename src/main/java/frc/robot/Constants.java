@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.util.PIDGains;
 
 public class Constants {
     public static final String CANIVORE_BUS_NAME = "Party Bus";

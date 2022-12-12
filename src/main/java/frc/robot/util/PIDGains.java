@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.util;
 
 public class PIDGains {
 	public final double kP;
