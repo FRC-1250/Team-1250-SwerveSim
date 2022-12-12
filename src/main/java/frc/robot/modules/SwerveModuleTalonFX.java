@@ -1,8 +1,8 @@
 package frc.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -43,14 +43,12 @@ public class SwerveModuleTalonFX {
         canCoder.configMagnetOffset(canCoderOffsetDegrees, Constants.CAN_TIMEOUT_MS);
         canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180, Constants.CAN_TIMEOUT_MS);
         canCoder.configSensorDirection(true, Constants.CAN_TIMEOUT_MS);
-        canCoder.setPositionToAbsolute(Constants.CAN_TIMEOUT_MS);
     }
 
     private void configureTurningTalon() {
         turningTalon.configFactoryDefault();
         turningTalon.configRemoteFeedbackFilter(canCoder, 0, Constants.CAN_TIMEOUT_MS);
         turningTalon.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);
-        turningTalon.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Signed_PlusMinus180, Constants.CAN_TIMEOUT_MS);
         turningTalon.configClosedloopRamp(0.5, Constants.CAN_TIMEOUT_MS);
         turningTalon.config_kF(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TURNING_TALON_POSITION_GAINS.kF, Constants.CAN_TIMEOUT_MS);
         turningTalon.config_kP(Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.TURNING_TALON_POSITION_GAINS.kP, Constants.CAN_TIMEOUT_MS);
@@ -61,15 +59,24 @@ public class SwerveModuleTalonFX {
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(driveTalon.getSelectedSensorVelocity(), getFromHeading());
-      }    
+    }
 
     public void setDesiredState(SwerveModuleState desiredState) {
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, getFromHeading());
-        driveTalon.set(ControlMode.Velocity, state.speedMetersPerSecond * Constants.METERS_PER_SECOND_TO_TALON_TICKS_CONVERSION_FACTOR);
-        turningTalon.set(ControlMode.Position, state.angle.getDegrees() * Constants.DEGRESS_TO_TALON_TICKS_CONVERSION_FACTOR);
+        driveTalon.set(TalonFXControlMode.Velocity, state.speedMetersPerSecond * Constants.METERS_PER_SECOND_TO_TALON_TICKS_CONVERSION_FACTOR);
+        turningTalon.set(TalonFXControlMode.Position, state.angle.getDegrees() * Constants.DEGRESS_TO_TALON_TICKS_CONVERSION_FACTOR);
     }
 
     private Rotation2d getFromHeading() {
-        return Rotation2d.fromDegrees(canCoder.getPosition());
+        return Rotation2d.fromDegrees(canCoder.getAbsolutePosition());
+    }
+
+    public String getRawData() {
+        return String.format("AbsPos - {}, Offset - {}, MagStr - {}, Drive vel - {}, Turning pos - {}",
+                        canCoder.getAbsolutePosition(),
+                        canCoder.configGetMagnetOffset(),
+                        canCoder.getMagnetFieldStrength(),
+                        driveTalon.getSelectedSensorVelocity(),
+                        turningTalon.getSelectedSensorPosition());
     }
 }
