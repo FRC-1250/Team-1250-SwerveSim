@@ -72,10 +72,10 @@ public class SwerveModuleTalonFX {
     }
 
     public String getRawData() {
-        return String.format("AbsPos - {}, Offset - {}, MagStr - {}, Drive vel - {}, Turning pos - {}",
+        return String.format("AbsPos - %.2f, Offset - %.2f, MagStr - %s, Drive vel - %.2f, Turning pos - %.2f",
                         canCoder.getAbsolutePosition(),
                         canCoder.configGetMagnetOffset(),
-                        canCoder.getMagnetFieldStrength(),
+                        canCoder.getMagnetFieldStrength().toString(),
                         driveTalon.getSelectedSensorVelocity(),
                         turningTalon.getSelectedSensorPosition());
     }
