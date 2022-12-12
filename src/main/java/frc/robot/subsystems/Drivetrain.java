@@ -112,12 +112,6 @@ public class Drivetrain extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxDriveSpeed);
-
-    SmartDashboard.putString("2.0 Front left module DESIRED", desiredStates[0].toString());
-    SmartDashboard.putString("2.1 Front right module DESIRED", desiredStates[1].toString());
-    SmartDashboard.putString("2.2 Rear left module DESIRED", desiredStates[2].toString());
-    SmartDashboard.putString("2.3 Rear right module DESIRED", desiredStates[3].toString());
-
     frontLeftModule.setDesiredState(desiredStates[0]);
     frontRightModule.setDesiredState(desiredStates[1]);
     rearLeftModule.setDesiredState(desiredStates[2]);
@@ -173,10 +167,16 @@ public class Drivetrain extends SubsystemBase {
         frontRightModule.getState(),
         rearLeftModule.getState(),
         rearRightModule.getState());
-    SmartDashboard.putNumber("Pigeon heading", pidgey.getAngle());
-    SmartDashboard.putString("2.0 Front left module CURRENT", frontLeftModule.getState().toString());
-    SmartDashboard.putString("2.1 Front right module CURRENT", frontRightModule.getState().toString());
-    SmartDashboard.putString("2.2 Rear left module CURRENT", rearLeftModule.getState().toString());
-    SmartDashboard.putString("2.3 Rear right module CURRENT", rearRightModule.getState().toString());
+
+    SmartDashboard.putNumber("Pigeon heading", getHeading());
+    SmartDashboard.putString("2.0 Front left module state", frontLeftModule.getState().toString());
+    SmartDashboard.putString("2.0 Front left module RAW", frontLeftModule.getRawData());
+    SmartDashboard.putString("2.1 Front right module state", frontRightModule.getState().toString());
+    SmartDashboard.putString("2.1 Front right module RAW", frontRightModule.getRawData());
+    SmartDashboard.putString("2.2 Rear left module state", rearLeftModule.getState().toString());
+    SmartDashboard.putString("2.2 Rear left module RAW", rearLeftModule.getRawData());
+    SmartDashboard.putString("2.3 Rear right module state", rearRightModule.getState().toString());
+    SmartDashboard.putString("2.3 Rear right module RAW", rearRightModule.getRawData());
+
   }
 }
