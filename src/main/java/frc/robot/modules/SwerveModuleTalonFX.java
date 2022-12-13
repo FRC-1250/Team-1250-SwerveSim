@@ -45,6 +45,8 @@ public class SwerveModuleTalonFX {
         canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180, Constants.CAN_TIMEOUT_MS);
         canCoder.configSensorDirection(true, Constants.CAN_TIMEOUT_MS);
         canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, Constants.CAN_TIMEOUT_MS);
+        //TODO: Try directly triggering pos to absolute if the above init strategy does not work
+        //canCoder.setPositionToAbsolute(Constants.CAN_TIMEOUT_MS);
     }
 
     private void configureTurningTalon() {
@@ -74,11 +76,16 @@ public class SwerveModuleTalonFX {
     }
 
     public String getRawData() {
-        return String.format("AbsPos - %.2f, Offset - %.2f, MagStr - %s, Drive vel - %.2f, Turning pos - %.2f",
+        return String.format("AbsPos - %.2f, Pos- %.2f, Offset - %.2f, Drive vel - %.2f, Turning pos - %.2f",
                         canCoder.getAbsolutePosition(),
+                        canCoder.getPosition(),
                         canCoder.configGetMagnetOffset(),
-                        canCoder.getMagnetFieldStrength().toString(),
                         driveTalon.getSelectedSensorVelocity(),
                         turningTalon.getSelectedSensorPosition());
+    }
+
+    // TODO: Determine way to detect drift and call as needed
+    public void setCanCoderToAbsolutePositon() {
+        canCoder.setPositionToAbsolute(Constants.CAN_TIMEOUT_MS);
     }
 }
