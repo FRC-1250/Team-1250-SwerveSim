@@ -21,7 +21,7 @@ public class RobotContainer {
                         xboxController::getLeftY,
                         xboxController::getLeftX,
                         xboxController::getRightX,
-                        false,
+                        true,
                         m_swerve));
     }
 
