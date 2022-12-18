@@ -61,8 +61,12 @@ public class SwerveModuleTalonFX {
         turningTalon.setNeutralMode(NeutralMode.Coast);
     }
 
+    /**
+     * Gets the current state of swerve module. 
+     * @return SwerveModuleState based on the driveTalons velocity divided by the conversation factor (Covert based to m/s) and the heading of its CanCoder. 
+     */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(driveTalon.getSelectedSensorVelocity(), getFromHeading());
+        return new SwerveModuleState(driveTalon.getSelectedSensorVelocity() / Constants.METERS_PER_SECOND_TO_TALON_TICKS_CONVERSION_FACTOR, getFromHeading());
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
@@ -72,7 +76,7 @@ public class SwerveModuleTalonFX {
     }
 
     private Rotation2d getFromHeading() {
-        return Rotation2d.fromDegrees(canCoder.getAbsolutePosition());
+        return Rotation2d.fromDegrees(canCoder.getPosition());
     }
 
     public String getRawData() {
