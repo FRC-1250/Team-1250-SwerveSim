@@ -43,7 +43,6 @@ public class SwerveModuleTalonFX {
         canCoder.configFactoryDefault();
         canCoder.configMagnetOffset(canCoderOffsetDegrees, Constants.CAN_TIMEOUT_MS);
         canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180, Constants.CAN_TIMEOUT_MS);
-        canCoder.configSensorDirection(true, Constants.CAN_TIMEOUT_MS);
         canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, Constants.CAN_TIMEOUT_MS);
         //TODO: Try directly triggering pos to absolute if the above init strategy does not work
         //canCoder.setPositionToAbsolute(Constants.CAN_TIMEOUT_MS);
@@ -51,6 +50,7 @@ public class SwerveModuleTalonFX {
 
     private void configureTurningTalon() {
         turningTalon.configFactoryDefault();
+        turningTalon.setSensorPhase(true);
         turningTalon.configRemoteFeedbackFilter(canCoder, 0, Constants.CAN_TIMEOUT_MS);
         turningTalon.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, Constants.TALONFX_PRIMARY_PID_LOOP_ID, Constants.CAN_TIMEOUT_MS);
         turningTalon.configClosedloopRamp(0.5, Constants.CAN_TIMEOUT_MS);
