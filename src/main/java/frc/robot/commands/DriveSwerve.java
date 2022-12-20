@@ -44,9 +44,9 @@ public class DriveSwerve extends CommandBase {
 
   @Override
   public void execute() {
-    xSpeed = yInputSupplier.getAsDouble();;
-    ySpeed = xInputSupplier.getAsDouble();
-    rotSpeed = rotationInputSupplier.getAsDouble();;
+    xSpeed = -yInputSupplier.getAsDouble();
+    ySpeed = -xInputSupplier.getAsDouble();
+    rotSpeed = -rotationInputSupplier.getAsDouble();
 
     if (!boostInputSupplier.getAsBoolean()) {
       ySpeed = ySpeed * throttle;
@@ -57,9 +57,13 @@ public class DriveSwerve extends CommandBase {
     ySpeed = MathUtil.applyDeadband(ySpeed, 0.1);
     rotSpeed = MathUtil.applyDeadband(rotSpeed, 0.1);
 
-    xSpeed = -m_xspeedLimiter.calculate(xSpeed) * Drivetrain.maxDriveSpeed;
+    xSpeed = m_xspeedLimiter.calculate(xSpeed) * Drivetrain.maxDriveSpeed;
     ySpeed = m_yspeedLimiter.calculate(ySpeed) * Drivetrain.maxDriveSpeed;
     rotSpeed = m_rotLimiter.calculate(rotSpeed) * Drivetrain.maxTurningSpeed;
+
+    xSpeed = xSpeed * Drivetrain.maxDriveSpeed;
+    ySpeed = ySpeed * Drivetrain.maxDriveSpeed;
+    rotSpeed = rotSpeed * Drivetrain.maxTurningSpeed;
 
     drivetrain.drive(xSpeed, ySpeed, rotSpeed, fieldRelative);
   }
