@@ -57,9 +57,9 @@ public class DriveSwerve extends CommandBase {
     ySpeed = MathUtil.applyDeadband(ySpeed, 0.1);
     rotSpeed = MathUtil.applyDeadband(rotSpeed, 0.1);
 
-    xSpeed = m_xspeedLimiter.calculate(xSpeed) * Drivetrain.maxDriveSpeed;
-    ySpeed = m_yspeedLimiter.calculate(ySpeed) * Drivetrain.maxDriveSpeed;
-    rotSpeed = m_rotLimiter.calculate(rotSpeed) * Drivetrain.maxTurningSpeed;
+    xSpeed = m_xspeedLimiter.calculate(xSpeed);
+    ySpeed = m_yspeedLimiter.calculate(ySpeed);
+    rotSpeed = m_rotLimiter.calculate(rotSpeed);
 
     xSpeed = xSpeed * Drivetrain.maxDriveSpeed;
     ySpeed = ySpeed * Drivetrain.maxDriveSpeed;
