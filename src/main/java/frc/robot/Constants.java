@@ -37,28 +37,31 @@ public class Constants {
     public static final Translation2d REAR_LEFT_MODULE_LOCATION = new Translation2d(-WHEELBASE / 2, TRACK_WIDTH / 2);
     public static final Translation2d REAR_RIGHT_MODULE_LOCATION = new Translation2d(-WHEELBASE / 2, -TRACK_WIDTH / 2);
 
-    public static final PIDGains DRIVE_TALON_VELOCITY_GAINS = new PIDGains(0.33, 0, 0.3, 1023.0 / 20660.0);
-    public static final PIDGains TURNING_TALON_POSITION_GAINS = new PIDGains(0.45, 0.0, 0.15, 0.0);
+    // TODO: Configure PID gains, tune them way down for now
+    public static final PIDGains DRIVE_TALON_VELOCITY_GAINS = new PIDGains(0.2, 0.0, 0.0, 0.0);
+    public static final PIDGains TURNING_TALON_POSITION_GAINS = new PIDGains(0.2, 0.0, 0.0, 0.0);
 
+    // TODO: Verify that flipping the canCoder direction also affects the absolute offset
+    // The signs have already been flipped to account for the direction change, remove if they're unaffected
     public static final int FRONT_LEFT_TURNING_TALON_CAN_ID = 17;
     public static final int FRONT_LEFT_DRIVE_TALON_CAN_ID = 18;
     public static final int FRONT_LEFT_CANCODER_CAN_ID = 19;
-    public static final double FRONT_LEFT_CANCODER_OFFSET = -46.14258;
+    public static final double FRONT_LEFT_CANCODER_OFFSET = 46.14258;
 
     public static final int FRONT_RIGHT_TURNING_TALON_CAN_ID = 14;
     public static final int FRONT_RIGHT_DRIVE_TALON_CAN_ID = 15;
     public static final int FRONT_RIGHT_CANCODER_CAN_ID = 16;
-    public static final double FRONT_RIGHT_CANCODER_OFFSET = -83.14453;
+    public static final double FRONT_RIGHT_CANCODER_OFFSET = 83.14453;
 
     public static final int REAR_LEFT_TURNING_TALON_CAN_ID = 20;
     public static final int REAR_LEFT_DRIVE_TALON_CAN_ID = 21;
     public static final int REAR_LEFT_CANCODER_CAN_ID = 22;
-    public static final double REAR_LEFT_CANCODER_OFFSET = -94.57031;
+    public static final double REAR_LEFT_CANCODER_OFFSET = 94.57031;
 
     public static final int REAR_RIGHT_TURNING_TALON_CAN_ID = 11;
     public static final int REAR_RIGHT_DRIVE_TALON_CAN_ID = 12;
     public static final int REAR_RIGHT_CANCODER_CAN_ID = 13;
-    public static final double REAR_RIGHT_CANCODER_OFFSET = 85.78125;
+    public static final double REAR_RIGHT_CANCODER_OFFSET = -85.78125;
 
     public static final int PIDGEON_CAN_ID = 23;
 }
